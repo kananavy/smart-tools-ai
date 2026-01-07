@@ -22,6 +22,11 @@
           <UserIcon class="w-5 h-5 mr-3" />
           Profile
         </router-link>
+        
+        <router-link to="/dashboard/pricing" class="flex items-center px-4 py-3 rounded-lg hover:bg-pink-500/10 text-pink-400 font-medium transition mt-4" :class="{ 'bg-pink-500/20': $route.path === '/dashboard/pricing' }">
+          <SparklesIcon class="w-5 h-5 mr-3" />
+          Upgrade to Pro
+        </router-link>
       </nav>
 
       <div class="p-4 border-t border-slate-700">
@@ -51,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { GalleryVerticalEndIcon, HistoryIcon, UserIcon, LogOutIcon } from 'lucide-vue-next';
+import { GalleryVerticalEndIcon, HistoryIcon, UserIcon, LogOutIcon, SparklesIcon } from 'lucide-vue-next';
 import { useAuthStore } from '../stores/auth';
 import { useRouter } from 'vue-router';
 
