@@ -18,4 +18,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // History
     Route::get('/history', [ToolController::class, 'history']);
+
+    // Subscription
+    Route::get('/subscription', [\App\Http\Controllers\Api\SubscriptionController::class, 'show']);
+    Route::post('/subscription/upgrade', [\App\Http\Controllers\Api\SubscriptionController::class, 'upgrade']);
 });

@@ -33,6 +33,21 @@ class ToolController extends Controller
         ]);
 
         $user = $request->user();
+
+        // Check subscription and usage limits
+        $subscription = $user->subscription;
+        if (!$subscription) {
+            return response()->json(['error' => 'No subscription found'], 403);
+        }
+
+        if (!$subscription->canGenerate()) {
+            return response()->json([
+                'error' => 'Usage limit reached',
+                'message' => 'You have reached your monthly generation limit. Please upgrade to Pro for unlimited access.',
+                'remaining' => 0
+            ], 429);
+        }
+
         $input = $request->input('prompt');
         $output = '';
 
@@ -51,7 +66,7 @@ class ToolController extends Controller
                 return response()->json(['error' => 'Tool not found'], 404);
         }
 
-        // Save to History (Mocking DB save if DB is down, but writing code as if it works)
+        // Save to History
         $tool = Tool::where('slug', $toolSlug)->first();
         if ($tool) {
             ToolRequest::create([
@@ -63,8 +78,12 @@ class ToolController extends Controller
             ]);
         }
 
+        // Increment usage count
+        $subscription->incrementUsage();
+
         return response()->json([
-            'result' => $output
+            'result' => $output,
+            'remaining' => $subscription->getRemainingGenerations()
         ]);
     }
 

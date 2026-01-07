@@ -51,4 +51,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(ToolRequest::class);
     }
+
+    public function subscription()
+    {
+        return $this->hasOne(Subscription::class);
+    }
 }

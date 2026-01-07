@@ -3,8 +3,10 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\Tool;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,10 +18,20 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Create test user
-        User::factory()->create([
+        $user = User::create([
             'name' => 'Test User',
             'email' => 'test@example.com',
-            'password' => \Illuminate\Support\Facades\Hash::make('password'),
+            'password' => Hash::make('password'),
+        ]);
+
+        // Create free subscription for test user
+        \App\Models\Subscription::create([
+            'user_id' => $user->id,
+            'plan' => 'free',
+            'monthly_limit' => 50,
+            'usage_count' => 0,
+            'resets_at' => now()->addMonth(),
+            'is_active' => true,
         ]);
 
         // Seed Tools
