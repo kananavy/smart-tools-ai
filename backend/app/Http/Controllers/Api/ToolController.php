@@ -5,14 +5,14 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Tool;
 use App\Models\ToolRequest;
-use App\Services\Ai\MockAiService;
+use App\Services\Ai\GroqAiService;
 use Illuminate\Http\Request;
 
 class ToolController extends Controller
 {
     protected $aiService;
 
-    public function __construct(MockAiService $aiService)
+    public function __construct(GroqAiService $aiService)
     {
         $this->aiService = $aiService;
     }
