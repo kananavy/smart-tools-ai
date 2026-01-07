@@ -22,4 +22,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Subscription
     Route::get('/subscription', [\App\Http\Controllers\Api\SubscriptionController::class, 'show']);
     Route::post('/subscription/upgrade', [\App\Http\Controllers\Api\SubscriptionController::class, 'upgrade']);
+
+    // Export (Pro feature)
+    Route::post('/export', [\App\Http\Controllers\Api\ExportController::class, 'export']);
 });

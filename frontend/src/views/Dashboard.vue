@@ -3,7 +3,11 @@
     <!-- Hero Section -->
     <div class="relative overflow-hidden">
       <!-- Animated background -->
-      <div class="absolute inset-0 bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-pink-600/20 animate-pulse"></div>
+      <div class="absolute inset-0 bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-pink-600/20"></div>
+      <div class="absolute inset-0">
+        <div class="absolute top-20 left-20 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute bottom-20 right-20 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      </div>
       
       <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <!-- Welcome Header -->
@@ -60,7 +64,7 @@
             </div>
             <h3 class="text-slate-400 text-sm mb-2">Account Status</h3>
             <p class="text-3xl font-bold text-white capitalize">{{ subscription?.plan || 'Free' }}</p>
-            <router-link v-if="subscription?.plan !== 'pro'" to="/pricing" class="inline-flex items-center text-xs text-pink-400 hover:text-pink-300 mt-2 group-hover:underline">
+            <router-link v-if="subscription?.plan !== 'pro'" to="/dashboard/pricing" class="inline-flex items-center text-xs text-pink-400 hover:text-pink-300 mt-2 group-hover:underline">
               Upgrade to Pro →
             </router-link>
           </div>
