@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+/* Custom Base Styles */
+@layer base {
+  body {
+    @apply bg-slate-900 text-slate-100;
+    /* Dark mode default */
+  }
+}
