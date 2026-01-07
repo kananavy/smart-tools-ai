@@ -19,7 +19,7 @@ A modern web platform featuring AI-powered tools for content generation, text su
 - **Laravel 11** - PHP framework
 - **SQLite** - Database
 - **Laravel Sanctum** - API authentication
-- **Mock AI Service** - Simulated AI responses (ready for real AI integration)
+- **Groq API** - Real AI integration with Llama 3.3 70B model
 
 ### Frontend
 - **Vue 3** - Progressive JavaScript framework
@@ -56,7 +56,14 @@ php artisan key:generate
 php artisan migrate:fresh --seed
 ```
 
-3. **Frontend Setup**
+3. **Configure Groq API** (for real AI generation)
+   - Get a free API key from [Groq Console](https://console.groq.com)
+   - Add to your `.env` file:
+   ```
+   GROQ_API_KEY=your_groq_api_key_here
+   ```
+
+4. **Frontend Setup**
 ```bash
 cd ../frontend
 npm install
@@ -120,6 +127,21 @@ smart-tools-ai/
 - `GET /api/tools` - List available tools (authenticated)
 - `POST /api/tools/{slug}/generate` - Generate content (authenticated)
 - `GET /api/history` - Get user's generation history (authenticated)
+
+## AI Services
+
+The application supports multiple AI service providers. Currently configured to use **Groq** with Llama 3.3 70B:
+
+### Available Services
+- **Groq** (Active) - Ultra-fast inference with Llama 3.3 70B
+- **Google Gemini** - Multimodal AI (text + images)
+- **DeepSeek** - Powerful language model
+
+### Switching AI Services
+To change the AI service, update `ToolController.php`:
+```php
+public function __construct(GroqAiService $aiService) // Change to GeminiAiService or DeepSeekAiService
+```
 
 ## Development
 
