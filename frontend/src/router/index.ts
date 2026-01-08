@@ -3,7 +3,6 @@ import Login from '../views/Login.vue';
 import Register from '../views/Register.vue';
 import Landing from '../views/Landing.vue';
 import Dashboard from '../layouts/DashboardLayout.vue';
-import Tools from '../views/Tools.vue';
 
 const routes = [
     {
@@ -22,19 +21,28 @@ const routes = [
         component: Register,
     },
     {
+        path: '/chat/:slug',
+        name: 'Chat',
+        component: () => import('../views/ChatInterface.vue'),
+    },
+    {
         path: '/dashboard',
+        redirect: '/chat/text-generator'
+    },
+    {
+        path: '/dashboard/old', // Kept for reference or transition if needed
         component: Dashboard,
         children: [
             {
-                path: '',
-                name: 'Tools',
-                component: Tools,
+                path: '', // Default child route for /dashboard
+                redirect: { name: 'Tools' } // Redirect to the 'Tools' route
             },
             {
-                path: 'tools/:slug',
-                name: 'ToolRunner',
-                component: () => import('../views/ToolRunner.vue'),
+                path: 'tools',
+                name: 'Tools',
+                component: () => import('../views/Tools.vue'),
             },
+
             {
                 path: 'history',
                 name: 'History',

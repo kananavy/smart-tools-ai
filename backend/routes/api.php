@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ToolController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/register', [AuthController::class, 'register']);
@@ -15,6 +14,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Tools Routes
     Route::get('/tools', [ToolController::class, 'index']);
     Route::post('/tools/{tool}/generate', [ToolController::class, 'generate']);
+    Route::apiResource('conversations', \App\Http\Controllers\Api\ConversationController::class);
 
     // History
     Route::get('/history', [ToolController::class, 'history']);

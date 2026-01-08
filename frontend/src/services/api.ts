@@ -32,8 +32,20 @@ export const getTools = async () => {
     return response.data;
 };
 
-export const generateContent = async (slug: string, data: { prompt: string; tone?: string }) => {
-    const response = await api.post<{ result: string }>(`/tools/${slug}/generate`, data);
+export interface GenerateOptions {
+    prompt: string;
+    tone?: string;
+    length?: string;
+    image?: string;
+}
+
+export interface GenerateResponse {
+    result: string;
+    remaining: number;
+}
+
+export const generateContent = async (slug: string, data: GenerateOptions) => {
+    const response = await api.post<GenerateResponse>(`/tools/${slug}/generate`, data);
     return response.data;
 };
 

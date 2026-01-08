@@ -27,63 +27,79 @@ class ToolController extends Controller
 
     public function generate(Request $request, string $toolSlug)
     {
-        // Validate input
-        $request->validate([
-            'prompt' => 'required|string',
-        ]);
-
+        $request->validate(['prompt' => 'required|string']);
         $user = $request->user();
-
-        // Check subscription and usage limits
         $subscription = $user->subscription;
-        if (!$subscription) {
-            return response()->json(['error' => 'No subscription found'], 403);
+
+        // --- Limit Check (Simple: Pro unlimited, Free 2 images, others unlim for now) ---
+        $isPro = $subscription && $subscription->status === 'active' && $subscription->plan_type === 'pro';
+        if (!$isPro && in_array($toolSlug, ['image-analyzer', 'image-generator'])) {
+            $usage = $user->toolRequests()
+                ->where('tool_id', Tool::where('slug', $toolSlug)->value('id'))
+                ->whereMonth('created_at', now()->month)
+                ->count();
+            if ($usage >= 2) {
+                return response()->json(['message' => 'Free limit reached (2 images/month). Upgrade to Pro.'], 403);
+            }
         }
 
-        if (!$subscription->canGenerate()) {
-            return response()->json([
-                'error' => 'Usage limit reached',
-                'message' => 'You have reached your monthly generation limit. Please upgrade to Pro for unlimited access.',
-                'remaining' => 0
-            ], 429);
+        // --- Conversation Handling ---
+        $conversation = null;
+        if ($id = $request->input('conversation_id')) {
+            $conversation = $user->conversations()->find($id);
+        }
+        if (!$conversation) {
+            $title = substr($request->input('prompt'), 0, 30);
+            $conversation = $user->conversations()->create(['title' => $title ?: 'New Chat']);
         }
 
+        // --- Generation ---
         $input = $request->input('prompt');
         $output = '';
 
-        // Determine tool and execute service
-        switch ($toolSlug) {
-            case 'text-generator':
-                $output = $this->aiService->generateText($input, $request->input('tone', 'neutral'));
-                break;
-            case 'summarizer':
-                $output = $this->aiService->summarize($input);
-                break;
-            case 'image-analyzer':
-                $output = $this->aiService->analyzeImage($input); // Assuming input is path or mock
-                break;
-            default:
-                return response()->json(['error' => 'Tool not found'], 404);
+        try {
+            switch ($toolSlug) {
+                case 'text-generator':
+                    $output = $this->aiService->generateText($input, $request->input('tone', 'neutral'));
+                    break;
+                case 'summarizer':
+                    $output = $this->aiService->summarize($input);
+                    break;
+                case 'image-analyzer':
+                    $output = $this->aiService->analyzeImage($request->input('image'), $input);
+                    break;
+                case 'humanizer':
+                    $output = $this->aiService->humanizeText($input);
+                    break;
+                default:
+                    return response()->json(['error' => 'Tool not found'], 404);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
         }
 
-        // Save to History
+        // --- Save Request ---
         $tool = Tool::where('slug', $toolSlug)->first();
         if ($tool) {
             ToolRequest::create([
                 'user_id' => $user->id,
                 'tool_id' => $tool->id,
-                'input_data' => json_encode(['prompt' => $input]),
-                'output_data' => json_encode(['result' => $output]),
-                'status' => 'completed'
+                'conversation_id' => $conversation->id,
+                'input_data' => ['prompt' => $input],
+                'output_data' => ['result' => $output],
+                'status' => 'completed',
+                'role' => 'assistant'
             ]);
         }
 
-        // Increment usage count
-        $subscription->incrementUsage();
+        // Update Usage
+        if ($subscription)
+            $subscription->increment('usage_count');
 
         return response()->json([
             'result' => $output,
-            'remaining' => $subscription->getRemainingGenerations()
+            'conversation_id' => $conversation->id,
+            'remaining' => $isPro ? -1 : 999 // Simplified logic
         ]);
     }
 

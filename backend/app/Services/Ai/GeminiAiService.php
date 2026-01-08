@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Http;
 class GeminiAiService
 {
     protected string $apiKey;
+
     protected string $baseUrl = 'https://generativelanguage.googleapis.com/v1beta';
 
     public function __construct()
@@ -23,25 +24,26 @@ class GeminiAiService
                     'contents' => [
                         [
                             'parts' => [
-                                ['text' => "Generate creative text with a {$tone} tone: {$prompt}"]
-                            ]
-                        ]
+                                ['text' => "Generate creative text with a {$tone} tone: {$prompt}"],
+                            ],
+                        ],
                     ],
                     'generationConfig' => [
                         'temperature' => 0.9,
                         'maxOutputTokens' => 1024,
-                    ]
+                    ],
                 ]
             );
 
             if ($response->successful()) {
                 $data = $response->json();
+
                 return $data['candidates'][0]['content']['parts'][0]['text'] ?? 'No response generated.';
             }
 
-            return "Error: Unable to generate content. " . $response->body();
+            return 'Error: Unable to generate content. '.$response->body();
         } catch (\Exception $e) {
-            return "Error: " . $e->getMessage();
+            return 'Error: '.$e->getMessage();
         }
     }
 
@@ -54,25 +56,26 @@ class GeminiAiService
                     'contents' => [
                         [
                             'parts' => [
-                                ['text' => "Summarize the following text concisely:\n\n{$text}"]
-                            ]
-                        ]
+                                ['text' => "Summarize the following text concisely:\n\n{$text}"],
+                            ],
+                        ],
                     ],
                     'generationConfig' => [
                         'temperature' => 0.3,
                         'maxOutputTokens' => 512,
-                    ]
+                    ],
                 ]
             );
 
             if ($response->successful()) {
                 $data = $response->json();
+
                 return $data['candidates'][0]['content']['parts'][0]['text'] ?? 'No summary generated.';
             }
 
-            return "Error: Unable to summarize. " . $response->body();
+            return 'Error: Unable to summarize. '.$response->body();
         } catch (\Exception $e) {
-            return "Error: " . $e->getMessage();
+            return 'Error: '.$e->getMessage();
         }
     }
 
@@ -87,25 +90,26 @@ class GeminiAiService
                     'contents' => [
                         [
                             'parts' => [
-                                ['text' => "Describe what you would see in an image analysis scenario. Provide a detailed, creative description."]
-                            ]
-                        ]
+                                ['text' => 'Describe what you would see in an image analysis scenario. Provide a detailed, creative description.'],
+                            ],
+                        ],
                     ],
                     'generationConfig' => [
                         'temperature' => 0.7,
                         'maxOutputTokens' => 512,
-                    ]
+                    ],
                 ]
             );
 
             if ($response->successful()) {
                 $data = $response->json();
+
                 return $data['candidates'][0]['content']['parts'][0]['text'] ?? 'No analysis generated.';
             }
 
-            return "Error: Unable to analyze. " . $response->body();
+            return 'Error: Unable to analyze. '.$response->body();
         } catch (\Exception $e) {
-            return "Error: " . $e->getMessage();
+            return 'Error: '.$e->getMessage();
         }
     }
 }

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Http;
 class DeepSeekAiService
 {
     protected string $apiKey;
+
     protected string $baseUrl = 'https://api.deepseek.com/v1';
 
     public function __construct()
@@ -27,12 +28,12 @@ class DeepSeekAiService
                     'messages' => [
                         [
                             'role' => 'system',
-                            'content' => "You are a creative AI assistant. Generate content with a {$tone} tone."
+                            'content' => "You are a creative AI assistant. Generate content with a {$tone} tone.",
                         ],
                         [
                             'role' => 'user',
-                            'content' => $prompt
-                        ]
+                            'content' => $prompt,
+                        ],
                     ],
                     'temperature' => 0.9,
                     'max_tokens' => 1024,
@@ -40,12 +41,13 @@ class DeepSeekAiService
 
             if ($response->successful()) {
                 $data = $response->json();
+
                 return $data['choices'][0]['message']['content'] ?? 'No response generated.';
             }
 
-            return "Error: Unable to generate content. " . $response->body();
+            return 'Error: Unable to generate content. '.$response->body();
         } catch (\Exception $e) {
-            return "Error: " . $e->getMessage();
+            return 'Error: '.$e->getMessage();
         }
     }
 
@@ -62,12 +64,12 @@ class DeepSeekAiService
                     'messages' => [
                         [
                             'role' => 'system',
-                            'content' => 'You are a summarization expert. Provide concise, accurate summaries.'
+                            'content' => 'You are a summarization expert. Provide concise, accurate summaries.',
                         ],
                         [
                             'role' => 'user',
-                            'content' => "Summarize the following text:\n\n{$text}"
-                        ]
+                            'content' => "Summarize the following text:\n\n{$text}",
+                        ],
                     ],
                     'temperature' => 0.3,
                     'max_tokens' => 512,
@@ -75,12 +77,13 @@ class DeepSeekAiService
 
             if ($response->successful()) {
                 $data = $response->json();
+
                 return $data['choices'][0]['message']['content'] ?? 'No summary generated.';
             }
 
-            return "Error: Unable to summarize. " . $response->body();
+            return 'Error: Unable to summarize. '.$response->body();
         } catch (\Exception $e) {
-            return "Error: " . $e->getMessage();
+            return 'Error: '.$e->getMessage();
         }
     }
 
@@ -98,12 +101,12 @@ class DeepSeekAiService
                     'messages' => [
                         [
                             'role' => 'system',
-                            'content' => 'You are an image analysis expert. Provide detailed, creative descriptions.'
+                            'content' => 'You are an image analysis expert. Provide detailed, creative descriptions.',
                         ],
                         [
                             'role' => 'user',
-                            'content' => 'Describe what a typical image analysis would reveal. Be creative and detailed.'
-                        ]
+                            'content' => 'Describe what a typical image analysis would reveal. Be creative and detailed.',
+                        ],
                     ],
                     'temperature' => 0.7,
                     'max_tokens' => 512,
@@ -111,12 +114,13 @@ class DeepSeekAiService
 
             if ($response->successful()) {
                 $data = $response->json();
+
                 return $data['choices'][0]['message']['content'] ?? 'No analysis generated.';
             }
 
-            return "Error: Unable to analyze. " . $response->body();
+            return 'Error: Unable to analyze. '.$response->body();
         } catch (\Exception $e) {
-            return "Error: " . $e->getMessage();
+            return 'Error: '.$e->getMessage();
         }
     }
 }

@@ -44,7 +44,7 @@
                 <p class="text-slate-300 mb-2">Drag & drop an image here</p>
                 <p class="text-slate-500 text-sm mb-4">or</p>
                 <button
-                  @click="$refs.fileInput.click()"
+                  @click="fileInput?.click()"
                   class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition"
                 >
                   Browse Files

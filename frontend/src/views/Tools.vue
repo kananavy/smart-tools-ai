@@ -56,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 import { Zap, FileText, Image, Sparkles } from 'lucide-vue-next';
 import { getTools } from '../services/api';
 import api from '../services/api';

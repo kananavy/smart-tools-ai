@@ -11,7 +11,7 @@ class SubscriptionController extends Controller
     {
         $subscription = $request->user()->subscription;
 
-        if (!$subscription) {
+        if (! $subscription) {
             // Create default free subscription if doesn't exist
             $subscription = $request->user()->subscription()->create([
                 'plan' => 'free',
@@ -29,7 +29,7 @@ class SubscriptionController extends Controller
     {
         $subscription = $request->user()->subscription;
 
-        if (!$subscription) {
+        if (! $subscription) {
             return response()->json(['error' => 'No subscription found'], 404);
         }
 
@@ -43,7 +43,7 @@ class SubscriptionController extends Controller
 
         return response()->json([
             'message' => 'Successfully upgraded to Pro!',
-            'subscription' => $subscription
+            'subscription' => $subscription,
         ]);
     }
 }
