@@ -42,7 +42,6 @@ const routes = [
                 name: 'Tools',
                 component: () => import('../views/Tools.vue'),
             },
-
             {
                 path: 'history',
                 name: 'History',
@@ -56,9 +55,26 @@ const routes = [
             {
                 path: 'pricing',
                 name: 'Pricing',
-                component: () => import('../views/Pricing.vue'),
+                component: () => import('../views/UpgradePayment.vue'),
             }
         ]
+    },
+    // Nouvelle route pour PricingModal
+    {
+        path: '/pricing-modal',
+        name: 'PricingModal',
+        component: () => import('../views/PricingModal.vue'),
+        meta: {
+            requiresAuth: true // Si vous voulez que cette page nécessite une authentification
+        }
+    },
+    {
+        path: '/upgrade-payment',
+        name: 'UpgradePayment',
+        component: () => import('../views/UpgradePayment.vue'),
+        meta: {
+            requiresAuth: true // Si vous voulez que cette page nécessite une authentification
+        }
     }
 ];
 
@@ -68,9 +84,14 @@ const router = createRouter({
 });
 
 router.beforeEach((to, _from, next) => {
-    const publicPages = ['/login', '/register', '/'];
+    const publicPages = ['/login', '/register', '/', '/pricing-modal']; // Ajouter '/pricing-modal' si vous voulez qu'elle soit publique
     const authRequired = !publicPages.includes(to.path);
     const loggedIn = localStorage.getItem('token');
+
+    // Gestion spécifique pour PricingModal si nécessaire
+    if (to.meta.requiresAuth && !loggedIn) {
+        return next('/login');
+    }
 
     if (authRequired && !loggedIn) {
         return next('/login');

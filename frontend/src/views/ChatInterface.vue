@@ -24,7 +24,7 @@
       <div class="px-3 py-2 border-b border-white/5 space-y-1">
         <router-link 
             v-if="remaining !== -1"
-            to="/dashboard/pricing" 
+            to="/pricing-modal" 
             class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-pink-400 hover:bg-pink-500/10 transition-all font-medium"
         >
             <sparkles-icon class="w-4 h-4" />
@@ -305,6 +305,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, nextTick, computed, watch } from 'vue';
+import PricingModal from '../views/PricingModal.vue';
 import { useRoute } from 'vue-router';
 import { marked } from 'marked';
 import hljs from 'highlight.js';
@@ -349,6 +350,13 @@ const isListening = ref(false);
 
 const authStore = useAuthStore();
 const router = useRouter();
+const showPricingModal = ref(false);
+const currentPlan = ref<'free' | 'pro'>(remaining.value === -1 ? 'pro' : 'free');
+
+const handleUpgradeSuccess = () => {
+  remaining.value = -1;
+  loadHistory();
+};
 
 // Modes (ChatGPT Selection Style)
 const currentMode = ref('text-generator');
