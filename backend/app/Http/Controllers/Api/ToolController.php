@@ -31,15 +31,15 @@ class ToolController extends Controller
         $user = $request->user();
         $subscription = $user->subscription;
 
-        // --- Limit Check (Simple: Pro unlimited, Free 2 images, others unlim for now) ---
-        $isPro = $subscription && $subscription->status === 'active' && $subscription->plan_type === 'pro';
-        if (!$isPro && in_array($toolSlug, ['image-analyzer', 'image-generator'])) {
-            $usage = $user->toolRequests()
-                ->where('tool_id', Tool::where('slug', $toolSlug)->value('id'))
-                ->whereMonth('created_at', now()->month)
-                ->count();
-            if ($usage >= 2) {
-                return response()->json(['message' => 'Free limit reached (2 images/month). Upgrade to Pro.'], 403);
+        // --- Limit Check (Simple: Pro unlimited, Basic 40 generations) ---
+        $isPro = $subscription && $subscription->status === 'active' && $subscription->plan === 'pro';
+        if (!$isPro) {
+            $monthlyLimit = $subscription ? $subscription->monthly_limit : 40;
+            // Fallback if subscription is somehow missing usage_count
+            $currentUsage = $subscription ? $subscription->usage_count : 0;
+
+            if ($currentUsage >= $monthlyLimit) {
+                return response()->json(['message' => 'Monthly limit reached. Upgrade to Pro for unlimited access.'], 403);
             }
         }
 
@@ -93,13 +93,17 @@ class ToolController extends Controller
         }
 
         // Update Usage
-        if ($subscription)
+        if ($subscription) {
             $subscription->increment('usage_count');
+        }
 
         return response()->json([
             'result' => $output,
             'conversation_id' => $conversation->id,
-            'remaining' => $isPro ? -1 : 999 // Simplified logic
+            'result' => $output,
+            'conversation_id' => $conversation->id,
+            // Return -1 for Pro, otherwise calc remaining
+            'remaining' => $isPro ? -1 : max(0, ($subscription ? $subscription->monthly_limit : 40) - ($subscription ? $subscription->usage_count : 0))
         ]);
     }
 

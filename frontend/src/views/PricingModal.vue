@@ -22,7 +22,7 @@
         <!-- Free Plan -->
         <div class="bg-[#1a1a1a] border border-white/10 rounded-2xl p-6">
           <div class="mb-6">
-            <h3 class="text-2xl font-bold text-white mb-2">Free</h3>
+            <h3 class="text-2xl font-bold text-white mb-2">Basic</h3>
             <div class="flex items-baseline gap-1 mb-3">
               <span class="text-4xl font-bold text-white">$0</span>
               <span class="text-gray-500">/forever</span>
@@ -30,7 +30,7 @@
             <p class="text-gray-400 text-sm">See what AI can do</p>
             
             <!-- Current Plan Badge -->
-            <div v-if="currentPlan === 'free'" class="mt-4 px-4 py-2 bg-gray-800 text-gray-300 rounded-lg inline-block">
+            <div v-if="currentPlan === 'basic'" class="mt-4 px-4 py-2 bg-gray-800 text-gray-300 rounded-lg inline-block">
               Your current plan
             </div>
           </div>
@@ -49,15 +49,15 @@
           </div>
 
           <button
-            @click="selectPlan('free')"
+            @click="selectPlan('basic')"
             :class="[
               'w-full py-3 rounded-lg font-medium transition-all',
-              currentPlan === 'free'
+              currentPlan === 'basic'
                 ? 'bg-gray-800 text-gray-400 cursor-not-allowed'
                 : 'bg-white/10 text-white hover:bg-white/20'
             ]"
           >
-            {{ currentPlan === 'free' ? 'Current Plan' : 'Continue with Free' }}
+            {{ currentPlan === 'basic' ? 'Current Plan' : 'Continue with Free' }}
           </button>
         </div>
 
@@ -229,12 +229,12 @@ import {
 import api from '../services/api';
 
 const router = useRouter();
-const currentPlan = ref<'free' | 'pro' | 'business'>('free');
+const currentPlan = ref<'basic' | 'pro' | 'business'>('basic');
 const openFaqs = ref<number[]>([0, 1]);
 
 // Features
 const freeFeatures = [
-  { text: '5 AI generations per day', included: true },
+  { text: '40 AI generations per day', included: true },
   { text: 'Basic AI models', included: true },
   { text: 'Standard response time', included: true },
   { text: 'Community support', included: true },
@@ -298,19 +298,19 @@ const toggleFaq = (index: number) => {
   }
 };
 
-const selectPlan = async (plan: 'free' | 'pro' | 'business') => {
+const selectPlan = async (plan: 'basic' | 'pro' | 'business') => {
   if (plan === currentPlan.value) return;
   
   if (plan === 'pro') {
     router.push('/upgrade-payment');
   } else if (plan === 'business') {
     window.location.href = 'mailto:sales@smarttools.ai';
-  } else if (plan === 'free') {
-    if (confirm('Switch to Free plan? Your Pro features will be disabled.')) {
+  } else if (plan === 'basic') {
+    if (confirm('Switch to Basic plan? Your Pro features will be disabled.')) {
       try {
         await api.post('/subscription/downgrade');
-        currentPlan.value = 'free';
-        alert('Successfully switched to Free plan.');
+        currentPlan.value = 'basic';
+        alert('Successfully switched to Basic plan.');
       } catch (error) {
         alert('Failed to switch plans. Please try again.');
       }

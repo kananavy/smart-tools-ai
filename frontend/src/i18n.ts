@@ -6,7 +6,11 @@ const messages = {
             login: 'Login',
             getStarted: 'Get Started',
             features: 'Features',
-            pricing: 'Pricing'
+            pricing: 'Pricing',
+            plans: {
+                basic: 'Basic',
+                pro: 'Pro'
+            }
         },
         hero: {
             badge: 'Now with Llama 3.3 70B & Premium Tools',
@@ -37,6 +41,10 @@ const messages = {
                 title: 'Image Analysis',
                 desc: 'Extract insights, text, and details from images using advanced computer vision technology.',
                 new: 'New Feature'
+            },
+            humanizer: {
+                title: 'AI Humanizer',
+                desc: 'Transform robotic AI-generated text into natural, human-like content that bypasses detection.'
             }
         },
         cta: {
@@ -54,7 +62,11 @@ const messages = {
             login: 'Connexion',
             getStarted: 'Commencer',
             features: 'Fonctionnalités',
-            pricing: 'Tarifs'
+            pricing: 'Tarifs',
+            plans: {
+                basic: 'Basique',
+                pro: 'Pro'
+            }
         },
         hero: {
             badge: 'Maintenant avec Llama 3.3 70B & Outils Premium',
@@ -85,6 +97,10 @@ const messages = {
                 title: 'Analyse d\'Image',
                 desc: 'Extrayez des informations, du texte et des détails à partir d\'images grâce à une vision par ordinateur avancée.',
                 new: 'Nouveau'
+            },
+            humanizer: {
+                title: 'Humaniseur d\'IA',
+                desc: 'Transformez les textes générés par IA en contenu naturel et humain qui évite la détection.'
             }
         },
         cta: {

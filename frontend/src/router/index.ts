@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Login from '../views/Login.vue';
 import Register from '../views/Register.vue';
 import Landing from '../views/Landing.vue';
-import Dashboard from '../layouts/DashboardLayout.vue';
 
 const routes = [
     {
@@ -21,6 +20,11 @@ const routes = [
         component: Register,
     },
     {
+        path: '/auth/callback',
+        name: 'AuthCallback',
+        component: () => import('../views/AuthCallback.vue'),
+    },
+    {
         path: '/chat/:slug',
         name: 'Chat',
         component: () => import('../views/ChatInterface.vue'),
@@ -30,42 +34,19 @@ const routes = [
         redirect: '/chat/text-generator'
     },
     {
-        path: '/dashboard/old', // Kept for reference or transition if needed
-        component: Dashboard,
-        children: [
-            {
-                path: '', // Default child route for /dashboard
-                redirect: { name: 'Tools' } // Redirect to the 'Tools' route
-            },
-            {
-                path: 'tools',
-                name: 'Tools',
-                component: () => import('../views/Tools.vue'),
-            },
-            {
-                path: 'history',
-                name: 'History',
-                component: () => import('../views/History.vue'),
-            },
-            {
-                path: 'profile',
-                name: 'Profile',
-                component: () => import('../views/Profile.vue'),
-            },
-            {
-                path: 'pricing',
-                name: 'Pricing',
-                component: () => import('../views/UpgradePayment.vue'),
-            }
-        ]
-    },
-    // Nouvelle route pour PricingModal
-    {
         path: '/pricing-modal',
         name: 'PricingModal',
         component: () => import('../views/PricingModal.vue'),
         meta: {
-            requiresAuth: true // Si vous voulez que cette page nécessite une authentification
+            requiresAuth: true
+        }
+    },
+    {
+        path: '/profile',
+        name: 'Profile',
+        component: () => import('../views/UserProfile.vue'),
+        meta: {
+            requiresAuth: true
         }
     },
     {
@@ -73,7 +54,7 @@ const routes = [
         name: 'UpgradePayment',
         component: () => import('../views/UpgradePayment.vue'),
         meta: {
-            requiresAuth: true // Si vous voulez que cette page nécessite une authentification
+            requiresAuth: true
         }
     }
 ];

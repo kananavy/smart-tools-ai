@@ -11,11 +11,11 @@ class SubscriptionController extends Controller
     {
         $subscription = $request->user()->subscription;
 
-        if (! $subscription) {
-            // Create default free subscription if doesn't exist
+        if (!$subscription) {
+            // Create default basic subscription if doesn't exist
             $subscription = $request->user()->subscription()->create([
-                'plan' => 'free',
-                'monthly_limit' => 50,
+                'plan' => 'basic',
+                'monthly_limit' => 40,
                 'usage_count' => 0,
                 'resets_at' => now()->addMonth(),
                 'is_active' => true,
@@ -27,14 +27,36 @@ class SubscriptionController extends Controller
 
     public function upgrade(Request $request)
     {
-        $subscription = $request->user()->subscription;
+        $request->validate([
+            'card_number' => 'required|string',
+            'expiry' => 'required|string',
+            'cvc' => 'required|string',
+            'cardholder_name' => 'required|string',
+            'country' => 'required|string',
+        ]);
 
-        if (! $subscription) {
-            return response()->json(['error' => 'No subscription found'], 404);
+        $subscription = $request->user()->subscription;
+        if (!$subscription) {
+            $subscription = $request->user()->subscription()->create([
+                'plan' => 'basic',
+                'monthly_limit' => 40,
+                'usage_count' => 0,
+                'resets_at' => now()->addMonth(),
+                'is_active' => true,
+            ]);
         }
 
-        // In a real app, this would integrate with Stripe
-        // For now, we'll just upgrade directly
+        // Simulate payment validation
+        // In a real app, this would call Stripe/PayPal API
+        $cardNumber = preg_replace('/\D/', '', $request->card_number);
+
+        // Simple mock validation: Fail if card doesn't start with 4242
+        if (substr($cardNumber, 0, 4) !== '4242') {
+            return response()->json([
+                'message' => 'Payment failed. Card declined.'
+            ], 402);
+        }
+
         $subscription->update([
             'plan' => 'pro',
             'monthly_limit' => -1, // Unlimited

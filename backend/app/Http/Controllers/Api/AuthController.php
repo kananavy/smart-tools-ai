@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
@@ -22,6 +23,15 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+        ]);
+
+        // Create default basic subscription
+        $user->subscription()->create([
+            'plan' => 'basic',
+            'monthly_limit' => 40,
+            'usage_count' => 0,
+            'resets_at' => now()->addMonth(),
+            'is_active' => true,
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -42,7 +52,7 @@ class AuthController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
-        if (! $user || ! Hash::check($request->password, $user->password)) {
+        if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['Invalid credentials'],
             ]);
@@ -67,5 +77,82 @@ class AuthController extends Controller
     public function user(Request $request)
     {
         return $request->user();
+    }
+
+    public function socialLogin(Request $request)
+    {
+        $request->validate([
+            'provider' => 'required|string|in:google,github',
+        ]);
+
+        $provider = $request->provider;
+        $email = $provider . '_user@example.com';
+        $name = ucfirst($provider) . ' User';
+
+        $user = User::firstOrCreate(
+            ['email' => $email],
+            [
+                'name' => $name,
+                'password' => Hash::make(str()->random(16)),
+            ]
+        );
+
+        if (!$user->subscription) {
+            $user->subscription()->create([
+                'plan' => 'basic',
+                'monthly_limit' => 40,
+                'usage_count' => 0,
+                'resets_at' => now()->addMonth(),
+                'is_active' => true,
+            ]);
+        }
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'user' => $user,
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+        ]);
+    }
+
+    public function redirectToProvider($provider)
+    {
+        /** @var \Laravel\Socialite\Two\AbstractProvider $driver */
+        $driver = Socialite::driver($provider);
+        return $driver->stateless()->redirect()->getTargetUrl();
+    }
+
+    public function handleProviderCallback($provider)
+    {
+        try {
+            /** @var \Laravel\Socialite\Two\AbstractProvider $driver */
+            $driver = Socialite::driver($provider);
+            $socialUser = $driver->stateless()->user();
+        } catch (\Exception $e) {
+            return redirect(env('FRONTEND_URL') . '/login?error=oauth_failed');
+        }
+
+        $user = User::firstOrCreate(
+            ['email' => $socialUser->getEmail()],
+            [
+                'name' => $socialUser->getName() ?? $socialUser->getNickname(),
+                'password' => Hash::make(str()->random(24)),
+            ]
+        );
+
+        if (!$user->subscription) {
+            $user->subscription()->create([
+                'plan' => 'basic',
+                'monthly_limit' => 40,
+                'usage_count' => 0,
+                'resets_at' => now()->addMonth(),
+                'is_active' => true,
+            ]);
+        }
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return redirect(env('FRONTEND_URL') . '/auth/callback?token=' . $token);
     }
 }

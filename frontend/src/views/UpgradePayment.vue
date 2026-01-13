@@ -366,6 +366,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import api from '../services/api';
 
+
 const router = useRouter();
 
 // State
@@ -427,13 +428,18 @@ const formatExpiry = () => {
   
   // Validate expiry
   if (value.length === 5) {
-    const [month, year] = value.split('/');
+    const parts = value.split('/');
+    const month = parts[0];
+    const year = parts[1];
     const currentYear = new Date().getFullYear() % 100;
     const currentMonth = new Date().getMonth() + 1;
     
-    if (parseInt(month) < 1 || parseInt(month) > 12) {
+    const m = parseInt(month || '0');
+    const y = parseInt(year || '0');
+
+    if (isNaN(m) || m < 1 || m > 12) {
       expiryError.value = 'Invalid month';
-    } else if (parseInt(year) < currentYear || (parseInt(year) === currentYear && parseInt(month) < currentMonth)) {
+    } else if (isNaN(y) || y < currentYear || (y === currentYear && m < currentMonth)) {
       expiryError.value = 'Card has expired';
     } else {
       expiryError.value = '';
@@ -473,24 +479,12 @@ const handlePayment = async () => {
   processing.value = true;
   
   try {
-    // Simulate API call with delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // In production, use this:
-    // const response = await api.post('/subscription/upgrade', {
-    //   card_number: cardNumber.value.replace(/\s/g, ''),
-    //   expiry: expiry.value,
-    //   cvc: cvc.value,
-    //   cardholder_name: cardholderName.value,
-    //   country: country.value
-    // });
-    
-    // Simulate successful payment
-    console.log('Payment processed:', {
-      cardNumber: cardNumber.value,
+    // Call backend API
+    await api.post('/subscription/upgrade', {
+      card_number: cardNumber.value.replace(/\s/g, ''),
       expiry: expiry.value,
       cvc: cvc.value,
-      cardholderName: cardholderName.value,
+      cardholder_name: cardholderName.value,
       country: country.value
     });
     
